@@ -16,7 +16,7 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (Instance != null)
         {
-            Debug.LogError("Existe mais de um Sistema de acão das unidades" + transform + " - " + Instance);
+            Debug.LogError("Existe mais de um Sistema de acï¿½o das unidades" + transform + " - " + Instance);
             Destroy(gameObject);
             return;
         }
@@ -27,7 +27,11 @@ public class UnitActionSystem : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             if(TryHandleUnitSelection()) return;
-            selectedUnit.OnMove(MouseWorld.GetPosition());
+            GridPosition mousePosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
+            if(selectedUnit.GetMoveAction().IsValidActionGridPosition(mousePosition))
+            {
+                selectedUnit.GetMoveAction().OnMove(mousePosition);
+            }
         }
     }
 

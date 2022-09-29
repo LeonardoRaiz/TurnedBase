@@ -13,7 +13,7 @@ public class LevelGrid : MonoBehaviour
     {
         if (Instance != null)
         {
-            Debug.LogError("Existe mais de um Sistema de ac�o das unidades" + transform + " - " + Instance);
+            Debug.LogError("Existe mais de um Sistema de ação das unidades" + transform + " - " + Instance);
             Destroy(gameObject);
             return;
         }
@@ -46,9 +46,35 @@ public class LevelGrid : MonoBehaviour
         RemoveUnitAtGridPosition(fromGridPosition, unit);
         AddUnitAtGridPosition(toGridPosition, unit);
     }
-    
+
     public GridPosition GetGridPosition(Vector3 worldPosition)
     {
         return gridSystem.GetGridPosition(worldPosition);
     }
+    public bool IsValidGridPosition(GridPosition gridPosition)
+    {
+        return gridSystem.IsValidGridPosition(gridPosition);
+    }
+
+    public bool HasAnyUnitOnGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = gridSystem.GetGridObject(gridPosition);
+        return gridObject.HasAnyUnit();
+    }
+
+    public Vector3 GetWorldPosition(GridPosition gridPosition)
+    {
+        return gridSystem.GetWorldPosition(gridPosition);
+    }
+
+    public int GetWidth()
+    {
+        return gridSystem.GetWidth();
+    }
+
+    public int GetHeight()
+    {
+        return gridSystem.GetHeight();
+    }
+
 }

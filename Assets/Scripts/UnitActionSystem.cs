@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Random = UnityEngine.Random;
 
 public class UnitActionSystem : MonoBehaviour
 {
@@ -12,14 +13,16 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedActionChanged;
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionStarted;
+    public event EventHandler OnGenereteUnity;
 
     [SerializeField] private Unit selectedUnit;
-    [SerializeField] private Unit selectedUnit1;
-    [SerializeField] private Unit selectedUnit2;
+    [SerializeField] private Unit player2Unit;
     [SerializeField] private LayerMask unitPlayerMask;
 
     private BaseAction selectedAction;
     private bool isBusy;
+
+
 
     private void Awake()
     {
@@ -30,6 +33,8 @@ public class UnitActionSystem : MonoBehaviour
             return;
         }
         Instance = this;
+
+
     }
 
     private void Start()
@@ -174,13 +179,84 @@ public class UnitActionSystem : MonoBehaviour
 
     public void ChangeUnit()
     {
-        if (selectedUnit.IsPlayer1())
+        for (int x = 0; x < LevelGrid.Instance.GetWidth(); x++)
         {
-            SetSelectedUnit(selectedUnit2);
+            for (int z = 0; z < LevelGrid.Instance.GetHeight(); z++)
+            {
+                GridPosition allGridPosition = new GridPosition(x, z);
+                List<Unit> unitList = LevelGrid.Instance.GetUnitAtGridPosition(allGridPosition);
+
+                if (selectedUnit.IsPlayer1())
+                {
+
+                    for (int i = 0; i < unitList.Count; i++)
+                    {
+                        if (unitList[i].IsPlayer2())
+                        {
+                            SetSelectedUnit(unitList[i]);
+                            return;
+                        }
+                    }
+                }
+                else if (selectedUnit.IsPlayer2())
+                {
+
+                    for (int i = 0; i < unitList.Count; i++)
+                    {
+                        if (unitList[i].IsPlayer1())
+                        {
+                            SetSelectedUnit(unitList[i]);
+                            return;
+                        }
+                    }
+                }
+            }
         }
-        else
+
+    }
+
+    public void GenerateUnit(int width, int height, int countUnity)
+    {
+        List<Vector3> list = new List<Vector3>(new Vector3[countUnity]);
+        for (int i = 0; i < countUnity - 1; i++)
         {
-            SetSelectedUnit(selectedUnit1);
+            var position = new Vector3(evenNumber(width), 0, evenNumber(height));
+            while (list.Contains(position))
+            {
+                position =  new Vector3(evenNumber(width), 0, evenNumber(height));
+            }
+
+            Instantiate(selectedUnit, position, Quaternion.identity);
+
+            list[i] = position;
+        }
+
+        for (int i = 0; i < countUnity; i++)
+        {
+            var position = new Vector3(evenNumber(width), 0, evenNumber(height));
+            while (list.Contains(position))
+            {
+                position =  new Vector3(evenNumber(width), 0, evenNumber(height));
+            }
+
+            Instantiate(player2Unit, position, Quaternion.identity);
+
+            list[i] = position;
+        }
+
+        OnGenereteUnity?.Invoke(this, EventArgs.Empty);
+    }
+
+    private int evenNumber(int number)
+    {
+        var x = Random.Range(0, number);
+        if (x % 2 == 0)
+        {
+            return x;
+        } else
+        {
+            return x + 1;
         }
     }
 }
+

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,14 @@ using UnityEngine;
 public class LevelGrid : MonoBehaviour
 {
     public static LevelGrid Instance { get; private set; }
+    public event EventHandler OnCreateGrid;
     [SerializeField] private Transform gridDebugObjectPrefab;
+    [SerializeField] private Transform gridFloor;
+    [SerializeField] private Transform gridVisual;
     private GridSystem gridSystem;
 
+    private int width = 1;
+    private int height = 1;
 
     private void Awake()
     {
@@ -18,8 +24,20 @@ public class LevelGrid : MonoBehaviour
             return;
         }
         Instance = this;
-        gridSystem = new GridSystem(10, 10, 2f);
+        gridSystem = new GridSystem(width, height, 2f);
         gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
+        gridSystem.CreateFloor(gridFloor);
+    }
+
+    public void CreateGrid(int width, int height)
+    {
+        SetWidth(width);
+        SetHeight(height);
+        gridSystem = new GridSystem(width, height, 2f);
+        gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
+        gridSystem.CreateFloor(gridFloor);
+        Instantiate(gridVisual, transform.position, transform.rotation);
+        OnCreateGrid?.Invoke(this, EventArgs.Empty);
     }
 
 
@@ -76,5 +94,22 @@ public class LevelGrid : MonoBehaviour
     {
         return gridSystem.GetHeight();
     }
+
+    public Unit GetUnitOnGridPosition(GridPosition gridPosition)
+    {
+        GridObject gridObject = gridSystem.GetGridObject(gridPosition);
+        return gridObject.GetUnit();
+    }
+
+    public void SetWidth(int width)
+    {
+        this.width = width;
+    }
+
+    public void SetHeight(int height)
+    {
+        this.height = height;
+    }
+
 
 }

@@ -52,6 +52,18 @@ public class GridSystem
         }
     }
 
+    public void CreateFloor(Transform debugPrefab)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                GridPosition gridPosition = new GridPosition(x, z);
+                Transform floorTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
+            }
+        }
+    }
+
     public GridObject GetGridObject(GridPosition gridPosition)
     {
         return gridObjectsArray[gridPosition.x, gridPosition.z];
@@ -74,4 +86,5 @@ public class GridSystem
     {
         return height;
     }
+
 }
